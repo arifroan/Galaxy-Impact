@@ -214,7 +214,7 @@ function WarpParticles() {
   }), []);
 
   return (
-    <points frustumCulled={false}>
+    <points frustumCulled={true}>
       <bufferGeometry>
         <bufferAttribute attach="attributes-position" count={positions.length / 3} array={positions} itemSize={3} />
         <bufferAttribute attach="attributes-aSize" count={sizes.length} array={sizes} itemSize={1} />
@@ -313,7 +313,7 @@ function BackgroundStars() {
   }, []);
 
   return (
-    <points frustumCulled={false}>
+    <points frustumCulled={true}>
       <bufferGeometry>
         <bufferAttribute attach="attributes-position" count={positions.length / 3} array={positions} itemSize={3} />
         <bufferAttribute attach="attributes-color" count={colors.length / 3} array={colors} itemSize={3} />
@@ -338,7 +338,7 @@ export function GalaxyMap({ systems, onSelectSystem }: { systems: SystemData[], 
   
   // Generate random stars for the background galaxy (Milky Way representation)
   const [starPositions, starColors] = useMemo(() => {
-    const starCount = 5000;
+    const starCount = isMobile ? 1000 : 5000;
     const positions = new Float32Array(starCount * 3);
     const colors = new Float32Array(starCount * 3);
     

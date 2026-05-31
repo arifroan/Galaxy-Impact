@@ -97,7 +97,7 @@ export default function App() {
       <Canvas 
         className="touch-none" 
         camera={{ position: [0, 30, 40], fov: 45 }}
-        dpr={[1, Math.min(window.devicePixelRatio || 2, 2)]} // limit pixel ratio for mobile performance
+        dpr={[1, Math.min(window.devicePixelRatio || 1.5, 1.5)]} // limit pixel ratio for mobile performance
         gl={{ antialias: !isMobile, powerPreference: "high-performance" }} // mobile perf tweaks
         shadows={!isMobile}
       >

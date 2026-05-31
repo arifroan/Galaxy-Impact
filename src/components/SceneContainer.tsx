@@ -72,8 +72,8 @@ export function SceneContainer({ viewMode, systems, selectedSystem, selectedPlan
       )}
 
       {!isMobile && (
-        <EffectComposer>
-          <Bloom luminanceThreshold={0.9} luminanceSmoothing={0.3} intensity={1.5} mipmapBlur />
+        <EffectComposer disableNormalPass>
+          <Bloom luminanceThreshold={0.9} luminanceSmoothing={0.3} intensity={0.8} mipmapBlur />
         </EffectComposer>
       )}
     </>

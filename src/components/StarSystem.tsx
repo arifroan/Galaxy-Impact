@@ -2,7 +2,8 @@ import { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { SystemData, PlanetData } from '../data';
-import { Html } from '@react-three/drei';
+import { Html, Detailed } from '@react-three/drei';
+import { isMobile } from '../utils/device';
 
 export function StarSystem({ system, onSelectPlanet }: { system: SystemData, onSelectPlanet: (planet: PlanetData) => void }) {
   const groupRef = useRef<THREE.Group>(null);
@@ -45,10 +46,20 @@ export function StarSystem({ system, onSelectPlanet }: { system: SystemData, onS
 
             {/* Planet */}
             <group position={[planet.distanceFromStar, 0, 0]} onClick={(e) => { e.stopPropagation(); onSelectPlanet(planet); }}>
-              <mesh castShadow={!isMobile} receiveShadow={!isMobile}>
-                <sphereGeometry args={[planet.radius * 0.4, isMobile ? 16 : 32, isMobile ? 16 : 32]} />
-                <meshStandardMaterial color={planet.color} roughness={0.7} metalness={0.2} />
-              </mesh>
+              <Detailed distances={[0, 30, 80]}>
+                <mesh castShadow={!isMobile} receiveShadow={!isMobile}>
+                  <sphereGeometry args={[planet.radius * 0.4, 32, 32]} />
+                  <meshStandardMaterial color={planet.color} roughness={0.7} metalness={0.2} />
+                </mesh>
+                <mesh castShadow={!isMobile} receiveShadow={!isMobile}>
+                  <sphereGeometry args={[planet.radius * 0.4, 16, 16]} />
+                  <meshStandardMaterial color={planet.color} roughness={0.7} metalness={0.2} />
+                </mesh>
+                <mesh castShadow={!isMobile} receiveShadow={!isMobile}>
+                  <sphereGeometry args={[planet.radius * 0.4, 8, 8]} />
+                  <meshStandardMaterial color={planet.color} roughness={0.7} metalness={0.2} />
+                </mesh>
+              </Detailed>
               {/* Atmosphere Glow */}
               <mesh>
                  <sphereGeometry args={[planet.radius * 0.4 * 1.1, isMobile ? 16 : 32, isMobile ? 16 : 32]} />

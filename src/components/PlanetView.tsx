@@ -2,7 +2,7 @@ import { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { PlanetData, MoonData } from '../data';
-import { Html } from '@react-three/drei';
+import { Html, Detailed } from '@react-three/drei';
 import { isMobile } from '../utils/device';
 
 function Moon({ moon }: { moon: MoonData }) {
@@ -27,10 +27,20 @@ function Moon({ moon }: { moon: MoonData }) {
       
       {/* Moon Body */}
       <group position={[moon.distanceFromPlanet, 0, 0]}>
-        <mesh castShadow={!isMobile} receiveShadow={!isMobile}>
-          <sphereGeometry args={[moon.radius, isMobile ? 16 : 32, isMobile ? 16 : 32]} />
-          <meshStandardMaterial color={moon.color} roughness={0.9} />
-        </mesh>
+        <Detailed distances={[0, 15, 40]}>
+          <mesh castShadow={!isMobile} receiveShadow={!isMobile}>
+            <sphereGeometry args={[moon.radius, 32, 32]} />
+            <meshStandardMaterial color={moon.color} roughness={0.9} />
+          </mesh>
+          <mesh castShadow={!isMobile} receiveShadow={!isMobile}>
+            <sphereGeometry args={[moon.radius, 16, 16]} />
+            <meshStandardMaterial color={moon.color} roughness={0.9} />
+          </mesh>
+          <mesh castShadow={!isMobile} receiveShadow={!isMobile}>
+            <sphereGeometry args={[moon.radius, 8, 8]} />
+            <meshStandardMaterial color={moon.color} roughness={0.9} />
+          </mesh>
+        </Detailed>
         <Html distanceFactor={15} position={[0, -moon.radius - 0.5, 0]} center zIndexRange={[100, 0]}>
           <div className="px-1.5 py-0.5 bg-[#020308]/60 backdrop-blur-md rounded border border-white/10 text-white/70 font-mono text-[10px] whitespace-nowrap pointer-events-none uppercase">
             {moon.name}
@@ -57,10 +67,20 @@ export function PlanetView({ planet, starColor }: { planet: PlanetData, starColo
       <ambientLight intensity={0.05} color="#ffffff" />
       
       <group ref={planetRef}>
-        <mesh castShadow={!isMobile} receiveShadow={!isMobile}>
-          <sphereGeometry args={[4, isMobile ? 32 : 64, isMobile ? 32 : 64]} />
-          <meshStandardMaterial color={planet.color} roughness={0.8} metalness={0.1} />
-        </mesh>
+        <Detailed distances={[0, 20, 50]}>
+          <mesh castShadow={!isMobile} receiveShadow={!isMobile}>
+            <sphereGeometry args={[4, 64, 64]} />
+            <meshStandardMaterial color={planet.color} roughness={0.8} metalness={0.1} />
+          </mesh>
+          <mesh castShadow={!isMobile} receiveShadow={!isMobile}>
+            <sphereGeometry args={[4, 32, 32]} />
+            <meshStandardMaterial color={planet.color} roughness={0.8} metalness={0.1} />
+          </mesh>
+          <mesh castShadow={!isMobile} receiveShadow={!isMobile}>
+            <sphereGeometry args={[4, 16, 16]} />
+            <meshStandardMaterial color={planet.color} roughness={0.8} metalness={0.1} />
+          </mesh>
+        </Detailed>
         
         {/* Atmosphere glow */}
         <mesh>
