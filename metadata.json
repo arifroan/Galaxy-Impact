@@ -1,6 +1,6 @@
 {
-  "name": "Milky Way Explorer",
-  "description": "A sci-fi interactive 3D map of the Milky Way, star systems, and planets, featuring holographic overlays and mobile-first touch interactions.",
+  "name": "Untitled App",
+  "description": "A blank canvas ready for development.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }
