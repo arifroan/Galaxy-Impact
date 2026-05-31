@@ -4,6 +4,7 @@ import { OrbitControls } from '@react-three/drei';
 import { EffectComposer, Bloom } from '@react-three/postprocessing';
 import * as THREE from 'three';
 import { GalaxyMap } from './GalaxyMap';
+import { isMobile } from '../utils/device';
 import { StarSystem } from './StarSystem';
 import { PlanetView } from './PlanetView';
 import { SystemData, PlanetData } from '../data';
@@ -70,9 +71,11 @@ export function SceneContainer({ viewMode, systems, selectedSystem, selectedPlan
         <PlanetView planet={selectedPlanet} starColor={selectedSystem.starColor} />
       )}
 
-      <EffectComposer>
-        <Bloom luminanceThreshold={0.9} luminanceSmoothing={0.3} intensity={1.5} mipmapBlur />
-      </EffectComposer>
+      {!isMobile && (
+        <EffectComposer>
+          <Bloom luminanceThreshold={0.9} luminanceSmoothing={0.3} intensity={1.5} mipmapBlur />
+        </EffectComposer>
+      )}
     </>
   );
 }

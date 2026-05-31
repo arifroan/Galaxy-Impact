@@ -3,6 +3,7 @@ import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { SystemData } from '../data';
 import { Html, Text } from '@react-three/drei';
+import { isMobile } from '../utils/device';
 
 const vertexShader = `
   varying vec2 vUv;
@@ -169,7 +170,7 @@ function WarpParticles() {
   const materialRef = useRef<THREE.ShaderMaterial>(null);
   
   const [positions, sizes] = useMemo(() => {
-    const count = 2000;
+    const count = isMobile ? 800 : 2000;
     const pos = new Float32Array(count * 3);
     const size = new Float32Array(count);
     for(let i=0; i<count; i++) {
@@ -183,6 +184,7 @@ function WarpParticles() {
 
   const prevCamPos = useRef(new THREE.Vector3());
   const smoothedVelocity = useRef(new THREE.Vector3());
+  const tempVel = useMemo(() => new THREE.Vector3(), []);
   const isInitialized = useRef(false);
 
   useFrame((state, delta) => {
@@ -195,9 +197,9 @@ function WarpParticles() {
     }
 
     const dt = Math.max(0.001, Math.min(delta, 0.1)); 
-    const vel = new THREE.Vector3().subVectors(camPos, prevCamPos.current).divideScalar(dt);
+    tempVel.subVectors(camPos, prevCamPos.current).divideScalar(dt);
     
-    smoothedVelocity.current.lerp(vel, 0.1);
+    smoothedVelocity.current.lerp(tempVel, 0.1);
     prevCamPos.current.copy(camPos);
 
     if (materialRef.current) {
@@ -269,7 +271,7 @@ function BackgroundStars() {
 
   const [positions, sizes, colors] = useMemo(() => {
     const layerCount = 3;
-    const starsPerLayer = 10000;
+    const starsPerLayer = isMobile ? 4000 : 15000;
     const totalStars = layerCount * starsPerLayer;
     const pos = new Float32Array(totalStars * 3);
     const size = new Float32Array(totalStars);
@@ -393,9 +395,13 @@ export function GalaxyMap({ systems, onSelectSystem }: { systems: SystemData[], 
       <NebulaPlane position={[0, -10, 0]} size={200} colorSource="#38BDF8" colorTarget="#8B5CF6" speed={0.02} opacity={0.3} scaleParams={2.5} />
       <NebulaPlane position={[0, -25, 0]} size={280} colorSource="#8B5CF6" colorTarget="#ec4899" speed={0.012} opacity={0.2} scaleParams={1.8} />
       <NebulaPlane position={[0, -40, 0]} size={360} colorSource="#0f172a" colorTarget="#312e81" speed={0.008} opacity={0.4} scaleParams={1.2} />
-      <NebulaPlane position={[0, -60, 0]} size={500} colorSource="#4c1d95" colorTarget="#1e3a8a" speed={0.005} opacity={0.25} scaleParams={3.0} />
-      <NebulaPlane position={[0, -80, 0]} size={600} colorSource="#831843" colorTarget="#4c1d95" speed={0.003} opacity={0.2} scaleParams={2.0} />
-      <NebulaPlane position={[0, -100, 0]} size={800} colorSource="#020617" colorTarget="#1e1b4b" speed={0.001} opacity={0.5} scaleParams={1.0} />
+      {!isMobile && (
+        <>
+          <NebulaPlane position={[0, -60, 0]} size={500} colorSource="#4c1d95" colorTarget="#1e3a8a" speed={0.005} opacity={0.25} scaleParams={3.0} />
+          <NebulaPlane position={[0, -80, 0]} size={600} colorSource="#831843" colorTarget="#4c1d95" speed={0.003} opacity={0.2} scaleParams={2.0} />
+          <NebulaPlane position={[0, -100, 0]} size={800} colorSource="#020617" colorTarget="#1e1b4b" speed={0.001} opacity={0.5} scaleParams={1.0} />
+        </>
+      )}
 
       {/* Background galaxy points */}
       <points ref={pointsRef}>

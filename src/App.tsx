@@ -9,6 +9,7 @@ import { UIOverlay } from './components/UIOverlay';
 import { SceneContainer } from './components/SceneContainer';
 import { SYSTEMS, SystemData, PlanetData } from './data';
 import { enrichSystemsWithNasaData } from './services/nasaService';
+import { isMobile } from './utils/device';
 
 type ViewMode = 'galaxy' | 'system' | 'planet';
 
@@ -96,9 +97,9 @@ export default function App() {
       <Canvas 
         className="touch-none" 
         camera={{ position: [0, 30, 40], fov: 45 }}
-        dpr={[1, 2]} // limit pixel ratio for mobile performance
-        gl={{ antialias: false, powerPreference: "high-performance" }} // mobile perf tweaks
-        shadows
+        dpr={[1, Math.min(window.devicePixelRatio || 2, 2)]} // limit pixel ratio for mobile performance
+        gl={{ antialias: !isMobile, powerPreference: "high-performance" }} // mobile perf tweaks
+        shadows={!isMobile}
       >
         <color attach="background" args={['#020308']} />
         <Suspense fallback={null}>
