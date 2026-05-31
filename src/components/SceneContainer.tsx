@@ -1,6 +1,7 @@
 import { useRef, useEffect } from 'react';
 import { useThree } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
+import { EffectComposer, Bloom } from '@react-three/postprocessing';
 import * as THREE from 'three';
 import { GalaxyMap } from './GalaxyMap';
 import { StarSystem } from './StarSystem';
@@ -61,6 +62,10 @@ export function SceneContainer({ viewMode, systems, selectedSystem, selectedPlan
       {viewMode === 'planet' && selectedPlanet && selectedSystem && (
         <PlanetView planet={selectedPlanet} starColor={selectedSystem.starColor} />
       )}
+
+      <EffectComposer>
+        <Bloom luminanceThreshold={0.2} luminanceSmoothing={0.9} intensity={1.5} mipmapBlur />
+      </EffectComposer>
     </>
   );
 }

@@ -1,8 +1,8 @@
 import { useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
-import { SystemData } from './data';
-import { Html } from '@react-three/drei';
+import { SystemData } from '../data';
+import { Html, Text } from '@react-three/drei';
 
 const vertexShader = `
   varying vec2 vUv;
@@ -230,6 +230,91 @@ function WarpParticles() {
   );
 }
 
+const bgStarVertexShader = `
+  attribute float aSize;
+  varying vec3 vColor;
+  void main() {
+    vColor = color;
+    vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+    gl_PointSize = aSize * (300.0 / -mvPosition.z);
+    gl_Position = projectionMatrix * mvPosition;
+  }
+`;
+
+const bgStarFragmentShader = `
+  varying vec3 vColor;
+  void main() {
+    vec2 st = gl_PointCoord - vec2(0.5);
+    float dist = length(st);
+    if (dist > 0.5) discard;
+    float alpha = smoothstep(0.5, 0.1, dist);
+    gl_FragColor = vec4(vColor, alpha * 0.6);
+  }
+`;
+
+function BackgroundStars() {
+  const [positions, sizes, colors] = useMemo(() => {
+    const layerCount = 3;
+    const starsPerLayer = 2000;
+    const totalStars = layerCount * starsPerLayer;
+    const pos = new Float32Array(totalStars * 3);
+    const size = new Float32Array(totalStars);
+    const cols = new Float32Array(totalStars * 3);
+    
+    const colorChoices = [
+      new THREE.Color('#ffffff'), 
+      new THREE.Color('#93c5fd'), 
+      new THREE.Color('#fbbf24'), 
+      new THREE.Color('#8b5cf6')
+    ];
+
+    let idx = 0;
+    for (let layer = 0; layer < layerCount; layer++) {
+      const radius = 100 + layer * 100; // layers at distances 100, 200, 300
+      for (let i = 0; i < starsPerLayer; i++) {
+        const u = Math.random();
+        const v = Math.random();
+        const theta = 2 * Math.PI * u;
+        const phi = Math.acos(2 * v - 1);
+        
+        const r = radius + (Math.random() - 0.5) * 50; 
+
+        pos[idx * 3] = r * Math.sin(phi) * Math.cos(theta);
+        pos[idx * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
+        pos[idx * 3 + 2] = r * Math.cos(phi);
+
+        size[idx] = Math.random() * 2.0 + 0.5;
+
+        const baseColor = colorChoices[Math.floor(Math.random() * colorChoices.length)];
+        cols[idx * 3] = baseColor.r;
+        cols[idx * 3 + 1] = baseColor.g;
+        cols[idx * 3 + 2] = baseColor.b;
+
+        idx++;
+      }
+    }
+    return [pos, size, cols];
+  }, []);
+
+  return (
+    <points frustumCulled={false}>
+      <bufferGeometry>
+        <bufferAttribute attach="attributes-position" count={positions.length / 3} array={positions} itemSize={3} />
+        <bufferAttribute attach="attributes-color" count={colors.length / 3} array={colors} itemSize={3} />
+        <bufferAttribute attach="attributes-aSize" count={sizes.length} array={sizes} itemSize={1} />
+      </bufferGeometry>
+      <shaderMaterial
+        vertexShader={bgStarVertexShader}
+        fragmentShader={bgStarFragmentShader}
+        vertexColors
+        transparent
+        depthWrite={false}
+        blending={THREE.AdditiveBlending}
+      />
+    </points>
+  );
+}
+
 export function GalaxyMap({ systems, onSelectSystem }: { systems: SystemData[], onSelectSystem: (system: SystemData) => void }) {
   const pointsRef = useRef<THREE.Points>(null);
   
@@ -286,6 +371,7 @@ export function GalaxyMap({ systems, onSelectSystem }: { systems: SystemData[], 
 
   return (
     <group>
+      <BackgroundStars />
       <WarpParticles />
       {/* Background Nebula Layers for Parallax Depth */}
       <NebulaPlane position={[0, -10, 0]} size={200} colorSource="#38BDF8" colorTarget="#8B5CF6" speed={0.02} opacity={0.3} scaleParams={2.5} />
@@ -314,11 +400,18 @@ export function GalaxyMap({ systems, onSelectSystem }: { systems: SystemData[], 
              <sphereGeometry args={[1.6, 16, 16]} />
              <meshBasicMaterial color={sys.starColor} transparent opacity={0.2} blending={THREE.AdditiveBlending} depthWrite={false}/>
           </mesh>
-          <Html distanceFactor={20} position={[0, -1.2, 0]} center zIndexRange={[100, 0]}>
-            <div className="px-2 py-1 bg-[#020308]/60 backdrop-blur-md rounded border border-sky-400/30 text-white text-xs whitespace-nowrap cursor-pointer pointer-events-none hover:bg-sky-400/20 transition-colors">
-              {sys.name}
-            </div>
-          </Html>
+          <Text
+            position={[0, -2, 0]}
+            fontSize={1.2}
+            color="white"
+            anchorX="center"
+            anchorY="middle"
+            outlineWidth={0.1}
+            outlineColor="#020308"
+            renderOrder={2}
+          >
+            {sys.name}
+          </Text>
         </group>
       ))}
     </group>

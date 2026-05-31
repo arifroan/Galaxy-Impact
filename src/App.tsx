@@ -3,21 +3,41 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useState, Suspense } from 'react';
+import { useState, Suspense, useEffect } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { UIOverlay } from './components/UIOverlay';
 import { SceneContainer } from './components/SceneContainer';
 import { SYSTEMS, SystemData, PlanetData } from './data';
+import { enrichSystemsWithNasaData } from './services/nasaService';
 
 type ViewMode = 'galaxy' | 'system' | 'planet';
 
 export default function App() {
+  const [systemsData, setSystemsData] = useState<SystemData[]>(SYSTEMS);
+  const [isScanning, setIsScanning] = useState(true);
+
   const [viewMode, setViewMode] = useState<ViewMode>('galaxy');
   const [selectedSystem, setSelectedSystem] = useState<SystemData | null>(null);
   const [selectedPlanet, setSelectedPlanet] = useState<PlanetData | null>(null);
 
+  useEffect(() => {
+    const fetchNasa = async () => {
+      setIsScanning(true);
+      try {
+        const enriched = await enrichSystemsWithNasaData(SYSTEMS);
+        setSystemsData(enriched);
+      } catch (e) {
+        console.error("NASA Sync failed", e);
+      } finally {
+        setIsScanning(false);
+      }
+    };
+    fetchNasa();
+  }, []);
+
   const handleSelectSystem = (sys: SystemData) => {
-    setSelectedSystem(sys);
+    const freshSys = systemsData.find(s => s.id === sys.id) || sys;
+    setSelectedSystem(freshSys);
     setViewMode('system');
   };
 
@@ -37,12 +57,30 @@ export default function App() {
   };
 
   const handleBeginJourney = () => {
-    // Simple mock journey: jump to Solar System
-    const sol = SYSTEMS.find(s => s.id === 'sol');
+    const sol = systemsData.find(s => s.id === 'sol');
     if (sol) {
       handleSelectSystem(sol);
     }
   };
+
+  // Keep selected references fresh if background scan completes while viewing them
+  useEffect(() => {
+    if (selectedSystem) {
+      const freshSys = systemsData.find(s => s.id === selectedSystem.id);
+      if (freshSys && freshSys.description !== selectedSystem.description) {
+        setSelectedSystem(freshSys);
+      }
+    }
+    if (selectedPlanet && selectedSystem) {
+      const freshSys = systemsData.find(s => s.id === selectedSystem.id);
+      if (freshSys) {
+        const freshPlanet = freshSys.planets.find(p => p.id === selectedPlanet.id);
+        if (freshPlanet && freshPlanet.description !== selectedPlanet.description) {
+          setSelectedPlanet(freshPlanet);
+        }
+      }
+    }
+  }, [systemsData, selectedSystem, selectedPlanet]);
 
   return (
     <div className="w-full h-screen bg-[#020308] overflow-hidden relative font-sans selection:bg-sky-500/30">
@@ -52,6 +90,7 @@ export default function App() {
         selectedPlanet={selectedPlanet}
         onBack={handleBack}
         onBeginJourney={handleBeginJourney}
+        isScanning={isScanning}
       />
       
       <Canvas 
@@ -64,7 +103,7 @@ export default function App() {
         <Suspense fallback={null}>
           <SceneContainer
             viewMode={viewMode}
-            systems={SYSTEMS}
+            systems={systemsData}
             selectedSystem={selectedSystem}
             selectedPlanet={selectedPlanet}
             onSelectSystem={handleSelectSystem}

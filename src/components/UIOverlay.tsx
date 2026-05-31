@@ -10,9 +10,10 @@ interface UIOverlayProps {
   selectedPlanet: PlanetData | null;
   onBack: () => void;
   onBeginJourney: () => void;
+  isScanning?: boolean;
 }
 
-export function UIOverlay({ viewMode, selectedSystem, selectedPlanet, onBack, onBeginJourney }: UIOverlayProps) {
+export function UIOverlay({ viewMode, selectedSystem, selectedPlanet, onBack, onBeginJourney, isScanning }: UIOverlayProps) {
   return (
     <div className="absolute inset-0 pointer-events-none z-10 flex flex-col justify-between overflow-hidden p-4 sm:p-6 pb-8">
       {/* Top Bar */}
@@ -45,6 +46,21 @@ export function UIOverlay({ viewMode, selectedSystem, selectedPlanet, onBack, on
 
         {/* Right side controls / compass */}
         <div className="pointer-events-auto flex flex-col items-end gap-4">
+          {/* Scanning Indicator */}
+          <div className="bg-[#020308]/60 backdrop-blur-md px-3 py-1.5 border border-sky-400/20 rounded-full flex items-center gap-2 shadow-[0_0_10px_rgba(56,189,248,0.1)]">
+            {isScanning ? (
+              <>
+                <div className="w-2 h-2 bg-amber-400 rounded-full animate-pulse shadow-[0_0_5px_#FBBF24]" />
+                <span className="text-[10px] text-amber-400 font-mono tracking-widest uppercase whitespace-nowrap">Syncing NASA DB</span>
+              </>
+            ) : (
+              <>
+                <div className="w-2 h-2 bg-emerald-400 rounded-full shadow-[0_0_5px_#34d399]" />
+                <span className="text-[10px] text-emerald-400 font-mono tracking-widest uppercase whitespace-nowrap">NASA Synced</span>
+              </>
+            )}
+          </div>
+
           <div className="w-12 h-12 bg-[#020308]/60 backdrop-blur-md border border-sky-400/30 rounded-full flex items-center justify-center text-sky-400 shadow-[0_0_15px_rgba(56,189,248,0.15)] relative overflow-hidden">
             <Compass size={20} />
             <div className="absolute inset-0 border-t-2 border-sky-400 rounded-full animate-spin" style={{ animationDuration: '3s' }} />
