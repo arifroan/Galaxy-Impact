@@ -98,6 +98,7 @@ export default function App() {
         camera={{ position: [0, 30, 40], fov: 45 }}
         dpr={[1, 2]} // limit pixel ratio for mobile performance
         gl={{ antialias: false, powerPreference: "high-performance" }} // mobile perf tweaks
+        shadows
       >
         <color attach="background" args={['#020308']} />
         <Suspense fallback={null}>

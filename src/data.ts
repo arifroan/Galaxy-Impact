@@ -1,3 +1,11 @@
+export type MoonData = {
+  id: string;
+  name: string;
+  radius: number;
+  distanceFromPlanet: number;
+  color: string;
+};
+
 export type PlanetData = {
   id: string;
   name: string;
@@ -6,6 +14,7 @@ export type PlanetData = {
   radius: number;
   distanceFromStar: number;
   color: string;
+  moons?: MoonData[];
 };
 
 export type SystemData = {
@@ -25,9 +34,9 @@ export const SYSTEMS: SystemData[] = [
     position: [10, 0, 5],
     starColor: "#FBBF24", // Core Gold
     planets: [
-      { id: "earth", name: "Earth", description: "The Blue Marble. A terrestrial planet with a nitrogen-oxygen atmosphere, vast liquid water oceans, and an active geology.", type: "Terrestrial", radius: 1, distanceFromStar: 3, color: "#38BDF8" },
-      { id: "mars", name: "Mars", description: "The Red Planet. Characterised by its iron oxide surface dust, ancient river valleys, and the largest volcano in the system (Olympus Mons).", type: "Terrestrial", radius: 0.53, distanceFromStar: 4.5, color: "#ef4444" },
-      { id: "jupiter", name: "Jupiter", description: "A massive gas giant composed primarily of hydrogen and helium, featuring complex cloud bands and a long-lived anticyclonic storm known as the Great Red Spot.", type: "Gas Giant", radius: 3, distanceFromStar: 8, color: "#d97706" }
+      { id: "earth", name: "Earth", description: "The Blue Marble. A terrestrial planet with a nitrogen-oxygen atmosphere, vast liquid water oceans, and an active geology.", type: "Terrestrial", radius: 1, distanceFromStar: 3, color: "#38BDF8", moons: [{ id: "moon", name: "Moon", radius: 0.27, distanceFromPlanet: 5.5, color: "#d1d5db" }] },
+      { id: "mars", name: "Mars", description: "The Red Planet. Characterised by its iron oxide surface dust, ancient river valleys, and the largest volcano in the system (Olympus Mons).", type: "Terrestrial", radius: 0.53, distanceFromStar: 4.5, color: "#ef4444", moons: [{ id: "phobos", name: "Phobos", radius: 0.05, distanceFromPlanet: 4.5, color: "#9ca3af" }, { id: "deimos", name: "Deimos", radius: 0.03, distanceFromPlanet: 6.5, color: "#6b7280" }] },
+      { id: "jupiter", name: "Jupiter", description: "A massive gas giant composed primarily of hydrogen and helium, featuring complex cloud bands and a long-lived anticyclonic storm known as the Great Red Spot.", type: "Gas Giant", radius: 3, distanceFromStar: 8, color: "#d97706", moons: [{ id: "io", name: "Io", radius: 0.3, distanceFromPlanet: 6, color: "#fef08a" }, { id: "europa", name: "Europa", radius: 0.25, distanceFromPlanet: 7.5, color: "#e5e7eb" }, { id: "ganymede", name: "Ganymede", radius: 0.4, distanceFromPlanet: 9.5, color: "#9ca3af" }, { id: "callisto", name: "Callisto", radius: 0.38, distanceFromPlanet: 11.5, color: "#6b7280" }] }
     ]
   },
   {

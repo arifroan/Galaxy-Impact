@@ -49,7 +49,14 @@ export function SceneContainer({ viewMode, systems, selectedSystem, selectedPlan
 
   return (
     <>
-      <OrbitControls ref={controlsRef} enableDamping dampingFactor={0.05} />
+      <OrbitControls 
+        ref={controlsRef} 
+        enableDamping 
+        dampingFactor={0.05} 
+        zoomSpeed={0.6}
+        enableZoom={true}
+        enablePan={true}
+      />
       
       {viewMode === 'galaxy' && (
         <GalaxyMap systems={systems} onSelectSystem={onSelectSystem} />
@@ -64,7 +71,7 @@ export function SceneContainer({ viewMode, systems, selectedSystem, selectedPlan
       )}
 
       <EffectComposer>
-        <Bloom luminanceThreshold={0.2} luminanceSmoothing={0.9} intensity={1.5} mipmapBlur />
+        <Bloom luminanceThreshold={0.9} luminanceSmoothing={0.3} intensity={1.5} mipmapBlur />
       </EffectComposer>
     </>
   );

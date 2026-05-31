@@ -233,29 +233,43 @@ function WarpParticles() {
 const bgStarVertexShader = `
   attribute float aSize;
   varying vec3 vColor;
+  varying float vTwinkle;
+  uniform float uTime;
   void main() {
     vColor = color;
     vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
     gl_PointSize = aSize * (300.0 / -mvPosition.z);
     gl_Position = projectionMatrix * mvPosition;
+    vTwinkle = sin(uTime * 2.0 + position.x * 0.13 + position.y * 0.17) * 0.5 + 0.5;
   }
 `;
 
 const bgStarFragmentShader = `
   varying vec3 vColor;
+  varying float vTwinkle;
   void main() {
     vec2 st = gl_PointCoord - vec2(0.5);
     float dist = length(st);
     if (dist > 0.5) discard;
     float alpha = smoothstep(0.5, 0.1, dist);
-    gl_FragColor = vec4(vColor, alpha * 0.6);
+    // Overdriven color for bloom threshold
+    vec3 finalColor = vColor * (1.0 + vTwinkle * 1.5);
+    gl_FragColor = vec4(finalColor, alpha * (0.3 + vTwinkle * 0.7));
   }
 `;
 
 function BackgroundStars() {
+  const materialRef = useRef<THREE.ShaderMaterial>(null);
+  
+  useFrame((state) => {
+    if (materialRef.current) {
+      materialRef.current.uniforms.uTime.value = state.clock.elapsedTime;
+    }
+  });
+
   const [positions, sizes, colors] = useMemo(() => {
     const layerCount = 3;
-    const starsPerLayer = 2000;
+    const starsPerLayer = 10000;
     const totalStars = layerCount * starsPerLayer;
     const pos = new Float32Array(totalStars * 3);
     const size = new Float32Array(totalStars);
@@ -304,8 +318,10 @@ function BackgroundStars() {
         <bufferAttribute attach="attributes-aSize" count={sizes.length} array={sizes} itemSize={1} />
       </bufferGeometry>
       <shaderMaterial
+        ref={materialRef}
         vertexShader={bgStarVertexShader}
         fragmentShader={bgStarFragmentShader}
+        uniforms={{ uTime: { value: 0 } }}
         vertexColors
         transparent
         depthWrite={false}
@@ -373,10 +389,13 @@ export function GalaxyMap({ systems, onSelectSystem }: { systems: SystemData[], 
     <group>
       <BackgroundStars />
       <WarpParticles />
-      {/* Background Nebula Layers for Parallax Depth */}
+      {/* Background Nebula Layers for Parallax Depth (6 Layers) */}
       <NebulaPlane position={[0, -10, 0]} size={200} colorSource="#38BDF8" colorTarget="#8B5CF6" speed={0.02} opacity={0.3} scaleParams={2.5} />
-      <NebulaPlane position={[0, -25, 0]} size={280} colorSource="#8B5CF6" colorTarget="#FBBF24" speed={0.012} opacity={0.2} scaleParams={1.8} />
-      <NebulaPlane position={[0, -40, 0]} size={360} colorSource="#0f172a" colorTarget="#38BDF8" speed={0.005} opacity={0.15} scaleParams={1.2} />
+      <NebulaPlane position={[0, -25, 0]} size={280} colorSource="#8B5CF6" colorTarget="#ec4899" speed={0.012} opacity={0.2} scaleParams={1.8} />
+      <NebulaPlane position={[0, -40, 0]} size={360} colorSource="#0f172a" colorTarget="#312e81" speed={0.008} opacity={0.4} scaleParams={1.2} />
+      <NebulaPlane position={[0, -60, 0]} size={500} colorSource="#4c1d95" colorTarget="#1e3a8a" speed={0.005} opacity={0.25} scaleParams={3.0} />
+      <NebulaPlane position={[0, -80, 0]} size={600} colorSource="#831843" colorTarget="#4c1d95" speed={0.003} opacity={0.2} scaleParams={2.0} />
+      <NebulaPlane position={[0, -100, 0]} size={800} colorSource="#020617" colorTarget="#1e1b4b" speed={0.001} opacity={0.5} scaleParams={1.0} />
 
       {/* Background galaxy points */}
       <points ref={pointsRef}>
